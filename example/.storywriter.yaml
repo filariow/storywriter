@@ -1,0 +1,9 @@
+templates:
+  folder: templates
+output:
+  folder: agile
+  typed:
+    story: stories
+    epic: epics
+defaults:
+  owner: Tux

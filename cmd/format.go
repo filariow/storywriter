@@ -1,5 +1,4 @@
-The MIT License (MIT)
-
+/*
 Copyright © 2024 Francesco Ilario
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,3 +18,30 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+*/
+package cmd
+
+import (
+	"github.com/spf13/cobra"
+
+	"github.com/filariow/storywriter/pandoc"
+)
+
+// formatCmd represents the format command
+var formatCmd = &cobra.Command{
+	Use:   "format",
+	Short: "Formats to a provided format",
+	Long:  `Formats the input file to the provided format`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		oformat := cmd.Flag("to").Value.String()
+		return pandoc.Run(cmd.Context(), args[0], oformat)
+	},
+	Args:    cobra.ExactArgs(1),
+	Aliases: []string{"render"},
+}
+
+func init() {
+	rootCmd.AddCommand(formatCmd)
+
+	formatCmd.Flags().StringP("to", "t", "textile", "output format")
+}
