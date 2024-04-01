@@ -33,6 +33,26 @@ func Parse(configFile string) (*Config, error) {
 	return &cfg, nil
 }
 
+func (c *Config) SerializeDefault() error {
+  return c.Serialize(DefaultConfigFile)
+}
+
+func (c *Config) Serialize(configFile string) error {
+	v, err := os.Create(configFile)
+	if err != nil {
+		return err
+	}
+	defer v.Close()
+
+	bb, err := yaml.Marshal(c)
+  if err != nil {
+		return err
+	}
+
+   _, err = v.Write(bb)
+  return err 
+}
+
 type Config struct {
 	Templates Templates              `yaml:"templates"`
 	Output    Output                 `yaml:"output"`

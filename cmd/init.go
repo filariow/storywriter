@@ -22,37 +22,42 @@ THE SOFTWARE.
 package cmd
 
 import (
-  "os"
-	"os/exec"
-
+	"github.com/filariow/storywriter/config"
 	"github.com/spf13/cobra"
 )
 
-// editCmd represents the edit command
-var editCmd = &cobra.Command{
-	Use:   "edit",
-	Short: "Opens an editor to edit the story",
-  Long: `Opens an editor to edit the story.
-
-It uses the EDITOR environment variable to determine the editor to use.
-If not found, 'xdg-open' is used.`,
+// initCmd represents the init command
+var initCmd = &cobra.Command{
+	Use:   "init",
+	Short: "Creates a .storywriter.yaml configuration file",
 	RunE: func(cmd *cobra.Command, args []string) error {
-    ss := func() []string {
-      if editor, ok := os.LookupEnv("EDITOR"); ok {
-        return []string{editor, args[0]}
-      }
-      return []string{"xdg-open", args[0]}
-    }()
+    tf, err := cmd.Flags().GetString("templates-folder")
+    if err != nil {
+      return err
+    }
 
-    c := exec.CommandContext(cmd.Context(), ss[0], ss[1:]...)
-    c.Stdin = os.Stdin
-    c.Stderr = os.Stderr
-    c.Stdout = os.Stdout
-    return c.Run()
+    of, err := cmd.Flags().GetString("output-folder")
+    if err != nil {
+      return err
+    }
+
+    cfg := config.Config{
+      Templates: config.Templates{
+        Folder: tf,
+      },
+      Output: config.Output{
+        Folder: of,
+      },
+      Defaults: map[string]interface{}{},
+    }
+
+    return cfg.SerializeDefault()
 	},
-  Args: cobra.ExactArgs(1),
 }
 
 func init() {
-	rootCmd.AddCommand(editCmd)
+	rootCmd.AddCommand(initCmd)
+
+  initCmd.Flags().StringP("templates-folder", "t", "templates", "templates folder")
+  initCmd.Flags().StringP("output-folder", "o", "output", "templates folder")
 }
